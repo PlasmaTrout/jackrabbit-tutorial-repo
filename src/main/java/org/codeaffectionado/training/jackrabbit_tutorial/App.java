@@ -23,6 +23,17 @@ public class App
     			new SimpleCredentials("admin","admin".toCharArray()));
     	Node root = session.getRootNode();
     	
+    	if(!root.hasNode("content")){
+	    	Node contentNode = root.addNode("content");
+	    	Node peopleNode = contentNode.addNode("people");
+	    	Node jsmith = peopleNode.addNode("jsmith");
+	    	
+	    	jsmith.setProperty("firstname", "john");
+	    	jsmith.setProperty("age", 43);
+	    	
+	    	session.save();
+    	}
+    	
     	NodeIterator i = root.getNodes();
     	while(i.hasNext()){
     		Node node = i.nextNode();
