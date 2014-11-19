@@ -32,6 +32,10 @@ public class App
 	    	jsmith.setProperty("age", 43);
 	    	
 	    	session.save();
+    	}else{
+    		Node contentNode = root.getNode("content");
+    		contentNode.remove();
+    		session.save();
     	}
     	
     	NodeIterator i = root.getNodes();
