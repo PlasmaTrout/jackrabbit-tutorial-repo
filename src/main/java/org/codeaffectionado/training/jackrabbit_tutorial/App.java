@@ -1,6 +1,7 @@
 package org.codeaffectionado.training.jackrabbit_tutorial;
 
 import java.io.FileInputStream;
+import java.io.FileReader;
 
 import javax.jcr.ImportUUIDBehavior;
 import javax.jcr.Node;
@@ -12,37 +13,45 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Value;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 
+import org.apache.jackrabbit.commons.cnd.CndImporter;
 import org.apache.jackrabbit.core.TransientRepository;
 
-/**
- * Hello world!
- *
- */
 public class App 
 {
     public static void main( String[] args ) throws Exception
     {
-    	Repository repo = new TransientRepository();
-    	Session session = repo.login(
-    			new SimpleCredentials("admin","admin".toCharArray()));
-    	Node root = session.getRootNode();
-    
+    	Repository repository = new TransientRepository();
+    	  Session session = repository.login(
+    	          new SimpleCredentials("admin","admin".toCharArray()));
+
+    	  try{
+    	      CndImporter.registerNodeTypes(new FileReader("article.cnd"),session,true);
+
+    	      Node root = session.getRootNode();
+    	      
+    	      if(!root.hasNode("articles")){
+	    	      Node articles = root.addNode("articles");
+	    	      Node newNode = articles.addNode("article","ca:article");
+	    	      
+	    	      newNode.setProperty("ca:body","Hello World!");
+	    	      newNode.setProperty("ca:headline","New Hello World Article");
+	
+	    	      session.save();   
+    	      }
+
+    	      Node savedNode = root.getNode("articles/article");
+    	      dumpToConsole(savedNode);
+
+
+    	  }finally{
+    	      session.logout();
+    	  }
     	
-    	if(!root.hasNode("catalog")){
-	    	Node contentNode = root.addNode("catalog");
-	    	FileInputStream stream = new FileInputStream("tutorial.xml");
-	        session.importXML(contentNode.getPath(),stream,
-	        		ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
-	        stream.close();
-	    	session.save();
-    	}else{
-    		//Node contentNode = root.getNode("content");
-    		//contentNode.remove();
-    		//session.save();
-    	}
-    	
-    	dumpToConsole(root);
+    	//dumpToConsole(root);
     }
     
     public static void dumpToConsole(Node node) throws RepositoryException {
